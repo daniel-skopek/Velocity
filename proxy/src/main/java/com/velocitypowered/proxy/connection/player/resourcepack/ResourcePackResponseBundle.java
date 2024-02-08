@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2023 Velocity Contributors
+ * Copyright (C) 2024 Velocity Contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,16 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.velocitypowered.proxy.connection;
+package com.velocitypowered.proxy.connection.player.resourcepack;
 
-/**
- * Various useful constants.
- */
-public class VelocityConstants {
+import com.velocitypowered.api.event.player.PlayerResourcePackStatusEvent;
+import java.util.UUID;
 
-  private VelocityConstants() {
-    throw new AssertionError();
-  }
-
-  public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+@SuppressWarnings("checkstyle:MissingJavadocType")
+public record ResourcePackResponseBundle(UUID uuid, String hash,
+                                         PlayerResourcePackStatusEvent.Status status) {
 }

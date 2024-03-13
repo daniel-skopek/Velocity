@@ -26,8 +26,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
 import net.kyori.adventure.identity.Identified;
+import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
@@ -187,7 +190,7 @@ public interface Player extends
    *
    * @param reason component with the reason
    */
-  void disconnect(net.kyori.adventure.text.Component reason);
+  void disconnect(Component reason);
 
   /**
    * Sends chat input onto the players current server as if they typed it into the client chat box.
@@ -267,7 +270,7 @@ public interface Player extends
    *
    * @return collection of the applied resource packs.
    */
-  Collection<ResourcePackInfo> getAppliedResourcePacks();
+  @NotNull Collection<ResourcePackInfo> getAppliedResourcePacks();
 
   /**
    * Gets the {@link ResourcePackInfo} of the resource packs
@@ -276,7 +279,7 @@ public interface Player extends
    *
    * @return collection of the pending resource packs
    */
-  Collection<ResourcePackInfo> getPendingResourcePacks();
+  @NotNull Collection<ResourcePackInfo> getPendingResourcePacks();
 
   /**
    * <strong>Note that this method does not send a plugin message to the server the player
@@ -288,7 +291,7 @@ public interface Player extends
    * @inheritDoc
    */
   @Override
-  boolean sendPluginMessage(ChannelIdentifier identifier, byte[] data);
+  boolean sendPluginMessage(@NotNull ChannelIdentifier identifier, byte @NotNull[] data);
 
   @Override
   default @NotNull Key key() {
@@ -298,7 +301,7 @@ public interface Player extends
   @Override
   default @NotNull HoverEvent<HoverEvent.ShowEntity> asHoverEvent(
           @NotNull UnaryOperator<HoverEvent.ShowEntity> op) {
-    return HoverEvent.showEntity(op.apply(HoverEvent.ShowEntity.of(this, getUniqueId(),
+    return HoverEvent.showEntity(op.apply(HoverEvent.ShowEntity.showEntity(this, getUniqueId(),
             Component.text(getUsername()))));
   }
 
@@ -309,4 +312,91 @@ public interface Player extends
    * @return the player's client brand
    */
   @Nullable String getClientBrand();
+
+  //
+  // Custom Chat Completions API
+  //
+
+  /**
+   * Add custom chat completion suggestions shown to the player while typing a message.
+   *
+   * @param completions the completions to send
+   */
+  void addCustomChatCompletions(@NotNull Collection<String> completions);
+
+  /**
+   * Remove custom chat completion suggestions shown to the player while typing a message.
+   *
+   * <p>Online player names can't be removed with this method, it will only affect
+   * custom completions added by {@link #addCustomChatCompletions(Collection)}
+   * or {@link #setCustomChatCompletions(Collection)}.
+   *
+   * @param completions the completions to remove
+   */
+  void removeCustomChatCompletions(@NotNull Collection<String> completions);
+
+  /**
+   * Set the list of chat completion suggestions shown to the player while typing a message.
+   *
+   * <p>If completions were set previously, this method will remove them all
+   * and replace them with the provided completions.
+   *
+   * @param completions the completions to set
+   */
+  void setCustomChatCompletions(@NotNull Collection<String> completions);
+
+  //
+  // Non Supported Adventure Operations
+  // TODO: Service API
+  //
+
+  /**
+   * {@inheritDoc}
+   *
+   * <b>This method is not currently implemented in Velocity
+   * and will not perform any actions.</b>
+   */
+  @Override
+  default void playSound(@NotNull Sound sound) {
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <b>This method is not currently implemented in Velocity
+   * and will not perform any actions.</b>
+   */
+  @Override
+  default void playSound(@NotNull Sound sound, double x, double y, double z) {
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <b>This method is not currently implemented in Velocity
+   * and will not perform any actions.</b>
+   */
+  @Override
+  default void playSound(@NotNull Sound sound, Sound.Emitter emitter) {
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <b>This method is not currently implemented in Velocity
+   * and will not perform any actions.</b>
+   */
+  @Override
+  default void stopSound(@NotNull SoundStop stop) {
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <b>This method is not currently implemented in Velocity
+   * and will not perform any actions.</b>
+   */
+  @Override
+  default void openBook(@NotNull Book book) {
+  }
 }

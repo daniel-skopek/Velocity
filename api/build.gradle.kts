@@ -59,7 +59,7 @@ tasks {
 
         val o = options as StandardJavadocDocletOptions
         o.encoding = "UTF-8"
-        o.source = "8"
+        o.source = "17"
 
         o.links(
             "https://www.slf4j.org/apidocs/",
@@ -68,6 +68,13 @@ tasks {
             "https://docs.oracle.com/en/java/javase/17/docs/api/",
             "https://jd.advntr.dev/api/${libs.adventure.bom.get().version}/",
             "https://javadoc.io/doc/com.github.ben-manes.caffeine/caffeine"
+        )
+
+        o.tags(
+            "apiNote:a:API Note:",
+            "implSpec:a:Implementation Requirements:",
+            "implNote:a:Implementation Note:",
+            "sinceMinecraft:a:Since Minecraft:"
         )
 
         // Disable the crazy super-strict doclint tool in Java 8

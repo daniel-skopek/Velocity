@@ -23,6 +23,7 @@ import com.velocitypowered.api.event.player.PlayerResourcePackStatusEvent;
 import com.velocitypowered.api.proxy.player.ResourcePackInfo;
 import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -145,10 +146,20 @@ public final class ModernResourcePackHandler extends ResourcePackHandler {
       }
       // The resource pack has been applied correctly.
       case SUCCESSFUL -> {
+        pendingResourcePacks.remove(uuid);
         if (queued != null) {
           appliedResourcePacks.put(uuid, queued);
+        } else {
+          // When transitioning to another server that has a resource pack to apply,
+          // if one or more resource packs have already been applied from Velocity,
+          // the player sends more than 1 SUCCESSFUL response to the backend server,
+          // which results in the server receiving more resource pack responses
+          // than the server has sent requests to the player
+          final ResourcePackInfo appliedPack = appliedResourcePacks.get(uuid);
+          if (appliedPack != null) {
+            return handleResponseResult(appliedPack, bundle);
+          }
         }
-        pendingResourcePacks.remove(uuid);
       }
       // An error occurred while trying to download the resource pack to the client,
       // so the resource pack cannot be applied.
@@ -166,5 +177,18 @@ public final class ModernResourcePackHandler extends ResourcePackHandler {
     }
 
     return handleResponseResult(queued, bundle);
+  }
+
+  @Override
+  public boolean hasPackAppliedByHash(final byte[] hash) {
+    if (hash == null) {
+      return false;
+    }
+    for (final Map.Entry<UUID, ResourcePackInfo> appliedPack : appliedResourcePacks.entrySet()) {
+      if (Arrays.equals(appliedPack.getValue().getHash(), hash)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
